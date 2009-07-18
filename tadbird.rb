@@ -11,6 +11,6 @@ require 'json'
 
 # Once you're friends, tag anythign #tadbird and he'll retweet it.
 
-data = JSON.parse(File.open("tad.json").read)
+data = JSON.parse(File.open("tadbird.json").read)
 
 raise data .inspect
