@@ -12,25 +12,21 @@ require 'json_store'
 # Once you're friends, tag anythign #tadbird and he'll retweet it.
 
 class Tadbird
-  def initialize
-    @data = JSONStore.new("tadbird.json")
+  def initialize(file = "tadbird.json")
+    @data = JSONStore.new(file)
   end
 
   def add_tweet(tweet)
-    user = tweet[:user]
-    text = tweet[:text]
-
-    @data["tweets"] ||= []
-    @data["tweets"] << text
-
-    @data["counts"] ||= {}
-    @data["counts"][user] ||= 0
-    @data["counts"][user] += 1
-
+    counts[tweet[:user]] += 1
+    tweets << tweet[:text]
     @data.save
   end
+
+  def counts
+    @data["counts"] ||= Hash.new(0)
+  end
+
+  def tweets
+    @data["tweets"] ||= []
+  end
 end
-
-tad = Tadbird.new
-
-tad.add_tweet(:user => "deisinger", :text => "PEEKABOO")
