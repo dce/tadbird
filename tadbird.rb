@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 require 'rubygems'
-require 'json'
+require 'json_store'
 
 # If you say "peekaboo" to him, he replies back "thppp".
 
@@ -11,6 +11,26 @@ require 'json'
 
 # Once you're friends, tag anythign #tadbird and he'll retweet it.
 
-data = JSON.parse(File.open("tadbird.json").read)
+class Tadbird
+  def initialize
+    @data = JSONStore.new("tadbird.json")
+  end
 
-raise data .inspect
+  def add_tweet(tweet)
+    user = tweet[:user]
+    text = tweet[:text]
+
+    @data["tweets"] ||= []
+    @data["tweets"] << text
+
+    @data["counts"] ||= {}
+    @data["counts"][user] ||= 0
+    @data["counts"][user] += 1
+
+    @data.save
+  end
+end
+
+tad = Tadbird.new
+
+tad.add_tweet(:user => "deisinger", :text => "PEEKABOO")
