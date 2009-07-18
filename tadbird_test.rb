@@ -49,9 +49,9 @@ class TadbirdTest < Test::Unit::TestCase
 
   def tweet(opts = {})
     defaults = {
-      "id" => 1,
+      "id"        => 1,
       "from_user" => "deisinger",
-      "text" => "PEEKABOO"
+      "text"      => "PEEKABOO"
     }
 
     defaults.merge(opts)

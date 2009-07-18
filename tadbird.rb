@@ -35,7 +35,6 @@ class Tadbird
 
   def counts
     tweets.values.inject(Hash.new(0)) do |sums, tweet|
-      sums[tweet["from_user"]] ||= 0
       sums[tweet["from_user"]] += 1
       sums
     end
