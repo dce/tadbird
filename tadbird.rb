@@ -2,6 +2,7 @@
 
 require 'rubygems'
 require 'json_store'
+require 'twitter'
 
 # If you say "peekaboo" to him, he replies back "thppp".
 
@@ -17,17 +18,25 @@ class Tadbird
   end
 
   def tweet_exists?(tweet)
-    tweets.keys.include? tweet[:id]
+    tweets.keys.include?(tweet["id"])
   end
 
   def add_tweet(tweet)
-    tweets[tweet[:id]] = tweet unless tweet_exists? tweet
+    tweets[tweet["id"]] = tweet unless tweet_exists?(tweet)
+  end
+
+  def add_peekaboos
+    Twitter::Search.new("@tadbird peekaboo").each do |tweet|
+      if add_tweet(tweet)
+        p "friendship!" if counts[tweet["from_user"]] == 3
+      end
+    end
   end
 
   def counts
     tweets.values.inject(Hash.new(0)) do |sums, tweet|
-      sums[tweet[:user]] ||= 0
-      sums[tweet[:user]] += 1
+      sums[tweet["from_user"]] ||= 0
+      sums[tweet["from_user"]] += 1
       sums
     end
   end

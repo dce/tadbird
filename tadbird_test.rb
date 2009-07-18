@@ -21,7 +21,7 @@ class TadbirdTest < Test::Unit::TestCase
 
     context "with a tweet" do
       setup do
-        @tad.add_tweet(:id => 1, :user => "deisinger", :text => "PEEKABOO")
+        @tad.add_tweet(tweet)
       end
 
       should "store a count of tweets by user" do
@@ -29,22 +29,31 @@ class TadbirdTest < Test::Unit::TestCase
       end
 
       should "store a list of tweets" do
-        assert_equal({ 1 => { :id => 1, :user => "deisinger", :text => "PEEKABOO" } },
-          @tad.tweets)
+        assert_equal({ 1 => tweet }, @tad.tweets)
       end
 
       should "not add the same tweet twice" do
-        @tad.add_tweet(:id => 1, :user => "deisinger", :text => "PEEKABOO")
+        @tad.add_tweet(tweet)
         assert_equal 1, @tad.counts["deisinger"]
       end
 
       should "handle multiple tweets properly" do
-        @tad.add_tweet(:id => 2, :user => "krestashin", :text => "PEEKABOO")
-        @tad.add_tweet(:id => 3, :user => "deisinger",  :text => "OHAI")
+        @tad.add_tweet(tweet("id" => 2, "from_user" => "krestashin"))
+        @tad.add_tweet(tweet("id" => 3))
 
         assert_equal 2, @tad.counts["deisinger"]
         assert_equal 1, @tad.counts["krestashin"]
       end
     end
+  end
+
+  def tweet(opts = {})
+    defaults = {
+      "id" => 1,
+      "from_user" => "deisinger",
+      "text" => "PEEKABOO"
+    }
+
+    defaults.merge(opts)
   end
 end
