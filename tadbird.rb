@@ -19,12 +19,10 @@ class Tadbird
 
   def add_peekaboos
     Twitter::Search.new("@tadbird peekaboo").each do |tweet|
-      p tweet_exists?(tweet)
-
       if add_tweet(tweet)
         user = tweet["from_user"]
         add_friend(user) if counts[user] > 2
-        # peekaboo_to(user)
+        peekaboo_to(user)
       end
     end
   end
