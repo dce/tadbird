@@ -16,17 +16,27 @@ class Tadbird
     @data = JSONStore.new(file)
   end
 
+  def tweet_exists?(tweet)
+    tweets.keys.include? tweet[:id]
+  end
+
   def add_tweet(tweet)
-    counts[tweet[:user]] += 1
-    tweets << tweet[:text]
-    @data.save
+    tweets[tweet[:id]] = tweet unless tweet_exists? tweet
   end
 
   def counts
-    @data["counts"] ||= Hash.new(0)
+    tweets.values.inject(Hash.new(0)) do |sums, tweet|
+      sums[tweet[:user]] ||= 0
+      sums[tweet[:user]] += 1
+      sums
+    end
   end
 
   def tweets
-    @data["tweets"] ||= []
+    @data["tweets"] ||= {}
+  end
+
+  def save
+    @data.save
   end
 end

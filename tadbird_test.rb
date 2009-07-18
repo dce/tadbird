@@ -9,17 +9,19 @@ class TadbirdTest < Test::Unit::TestCase
       @tad = Tadbird.new("tadbird_test.json")
     end
 
-    should "have a count of zero for user by default" do
-      assert_equal 0, @tad.counts["deisinger"]
-    end
+    context "by default" do
+      should "have a count of zero for user" do
+        assert_equal 0, @tad.counts["deisinger"]
+      end
 
-    should "have an empty list of tweets by default" do
-      assert_equal [], @tad.tweets
+      should "have an empty list of tweets" do
+        assert_equal({}, @tad.tweets)
+      end
     end
 
     context "with a tweet" do
       setup do
-        @tad.add_tweet(:user => "deisinger", :text => "PEEKABOO")
+        @tad.add_tweet(:id => 1, :user => "deisinger", :text => "PEEKABOO")
       end
 
       should "store a count of tweets by user" do
@@ -27,20 +29,21 @@ class TadbirdTest < Test::Unit::TestCase
       end
 
       should "store a list of tweets" do
-        assert_equal ["PEEKABOO"], @tad.tweets
+        assert_equal({ 1 => { :id => 1, :user => "deisinger", :text => "PEEKABOO" } },
+          @tad.tweets)
+      end
+
+      should "not add the same tweet twice" do
+        @tad.add_tweet(:id => 1, :user => "deisinger", :text => "PEEKABOO")
+        assert_equal 1, @tad.counts["deisinger"]
       end
 
       should "handle multiple tweets properly" do
-        @tad.add_tweet(:user => "krestashin", :text => "PEEKABOO")
-        @tad.add_tweet(:user => "deisinger",  :text => "OHAI")
+        @tad.add_tweet(:id => 2, :user => "krestashin", :text => "PEEKABOO")
+        @tad.add_tweet(:id => 3, :user => "deisinger",  :text => "OHAI")
 
         assert_equal 2, @tad.counts["deisinger"]
-        assert_equal 1, @tad. counts["krestashin"]
-        assert_equal ["PEEKABOO", "PEEKABOO", "OHAI"], @tad.tweets
-      end
-
-      teardown do
-        File.delete("tadbird_test.json")
+        assert_equal 1, @tad.counts["krestashin"]
       end
     end
   end
