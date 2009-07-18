@@ -6,7 +6,7 @@ require 'tadbird'
 class TadbirdTest < Test::Unit::TestCase
   context "A Tadbird" do
     setup do
-      @tad = Tadbird.new("tadbird_test.json")
+      @tad = Tadbird.new("username", "password", "tadbird_test.json")
     end
 
     context "by default" do

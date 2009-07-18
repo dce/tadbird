@@ -1,19 +1,11 @@
-#!/usr/bin/ruby
-
 require 'rubygems'
 require 'json_store'
 require 'twitter'
 
-# If you say "peekaboo" to him, he replies back "thppp".
-
-# If you @reply him three times, he adds you as a friend.
-
-# Then when you say "peekaboo", he says "peekaboo".
-
-# Once you're friends, tag anythign #tadbird and he'll retweet it.
-
 class Tadbird
-  def initialize(file = "tadbird.json")
+  def initialize(username, password, file = "tadbird.json")
+    auth = Twitter::HTTPAuth.new(username, password)
+    @twitter = Twitter::Base.new(auth)
     @data = JSONStore.new(file)
   end
 
@@ -28,7 +20,9 @@ class Tadbird
   def add_peekaboos
     Twitter::Search.new("@tadbird peekaboo").each do |tweet|
       if add_tweet(tweet)
-        p "friendship!" if counts[tweet["from_user"]] == 3
+        user = tweet["from_user"]
+        add_friend(user) if counts[user] > 2
+        peekaboo_to(user)
       end
     end
   end
@@ -37,6 +31,27 @@ class Tadbird
     tweets.values.inject(Hash.new(0)) do |sums, tweet|
       sums[tweet["from_user"]] += 1
       sums
+    end
+  end
+
+  def peekaboo_to(user)
+    msg = if counts[user] > 2
+      "PEEKABOO"
+    else
+      str = proc { "thpp#{ "p" * rand(3) }" }
+      (1..(rand(3) + 1)).map { str.call } * " "
+    end
+    @twitter.update("@#{user} #{msg}")
+  end
+
+  def friends
+    @friends ||= @twitter.friends.map {|f| f.screen_name }
+  end
+
+  def add_friend(user)
+    unless friends.include?(user)
+      @twitter.friendship_create(user)
+      @friends = nil
     end
   end
 
