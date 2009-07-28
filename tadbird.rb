@@ -9,12 +9,18 @@ class Tadbird
     @data = JSONStore.new(file)
   end
 
+  def valid_tweet?(tweet)
+    tweet["text"] =~ /@tadbird/i and tweet["text"] =~ /peekaboo/i
+  end
+
   def tweet_exists?(tweet)
     tweets.keys.include?(tweet["id"].to_s)
   end
 
   def add_tweet(tweet)
-    tweets[tweet["id"].to_s] = tweet unless tweet_exists?(tweet)
+    unless !valid_tweet?(tweet) or tweet_exists?(tweet)
+      tweets[tweet["id"].to_s] = tweet
+    end
   end
 
   def add_peekaboos

@@ -19,6 +19,30 @@ class TadbirdTest < Test::Unit::TestCase
       end
     end
 
+    context "adding a tweet" do
+      should "require search terms" do
+        @tad.add_tweet tweet("text" => "wrong!")
+        assert_equal 0, @tad.tweets.size
+      end
+
+      should "require ALL search terms" do
+        @tad.add_tweet tweet("text" => "peekaboo")
+        assert_equal 0, @tad.tweets.size
+      end
+
+      should "ignore search order" do
+        @tad.add_tweet tweet("id" => 1, "text" => "@tadbird peekaboo")
+        @tad.add_tweet tweet("id" => 2, "text" => "peekaboo @tadbird")
+        assert_equal 2, @tad.tweets.size
+      end
+
+      should "ignore capitalization" do
+        @tad.add_tweet tweet("text" => "@tadbird pEEkabOO")
+        assert_equal 1, @tad.tweets.size
+      end
+    end
+
+
     context "with a tweet" do
       setup do
         @tad.add_tweet(tweet)
@@ -29,7 +53,7 @@ class TadbirdTest < Test::Unit::TestCase
       end
 
       should "store a list of tweets" do
-        assert_equal({ 1 => tweet }, @tad.tweets)
+        assert_equal({ "1" => tweet }, @tad.tweets)
       end
 
       should "not add the same tweet twice" do
@@ -51,7 +75,7 @@ class TadbirdTest < Test::Unit::TestCase
     defaults = {
       "id"        => 1,
       "from_user" => "deisinger",
-      "text"      => "PEEKABOO"
+      "text"      => "@tadbird PEEKABOO"
     }
 
     defaults.merge(opts)
